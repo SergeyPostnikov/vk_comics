@@ -5,6 +5,8 @@ from urllib.parse import urlparse, unquote
 from hashlib import blake2b
 from pathlib import Path
 
+from pprint import pprint
+
 BASE_DIR = Path(__file__).resolve().parent
 
 
@@ -32,6 +34,13 @@ def get_img_url(num):
     return response.json().get('img')
 
 
+def get_comment(num):
+    url = f'https://xkcd.com/{num}/info.0.json'
+    response = requests.get(url)
+    return response.json().get('alt')
+
+
 if __name__ == '__main__':
-    url = get_img_url(353)
-    save_picture(url=url, directory='images')
+    # url = get_img_url(353)
+    # save_picture(url=url, directory='images')
+    print(get_comment(353))
