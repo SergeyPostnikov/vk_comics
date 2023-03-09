@@ -6,6 +6,7 @@ from hashlib import blake2b
 from pathlib import Path
 
 from pprint import pprint
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -40,7 +41,23 @@ def get_comment(num):
     return response.json().get('alt')
 
 
+def get_groups(user_id, access_token):
+    url = 'https://api.vk.com/method/groups.get'
+    headers = {}
+    params = {
+        'user_id': user_id,
+        'access_token': access_token,
+        'v': 5.131
+    }
+    response = requests.get(url, params=params, headers=headers)
+    return response.json()
+
+
 if __name__ == '__main__':
     # url = get_img_url(353)
     # save_picture(url=url, directory='images')
-    print(get_comment(353))
+    # print(get_comment(353))
+    load_dotenv()
+    access_token = os.environ['VK_BOT_ACCESS_KEY']
+    user_id = os.environ['VK_USER_ID']
+    pprint(get_groups(user_id=user_id, access_token=access_token))
