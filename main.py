@@ -53,11 +53,26 @@ def get_groups(user_id, access_token):
     return response.json()
 
 
+def get_wall_upload_server(group_id, access_token):
+    url = 'https://api.vk.com/method/photos.getWallUploadServer'
+    params = {
+        'group_id': group_id,
+        'access_token': access_token,
+        'v': 5.131
+    }
+    response = requests.get(url, params=params)
+    return response.json()
+
+
 if __name__ == '__main__':
     # url = get_img_url(353)
     # save_picture(url=url, directory='images')
     # print(get_comment(353))
+
     load_dotenv()
     access_token = os.environ['VK_BOT_ACCESS_KEY']
-    user_id = os.environ['VK_USER_ID']
-    pprint(get_groups(user_id=user_id, access_token=access_token))
+    # user_id = os.environ['VK_USER_ID']
+    # pprint(get_groups(user_id=user_id, access_token=access_token))
+
+    group_id = os.environ['VK_XKCD_GROUP_ID']
+    pprint(get_wall_upload_server(group_id, access_token=access_token))
