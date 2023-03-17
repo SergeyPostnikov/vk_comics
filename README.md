@@ -7,7 +7,6 @@
 Создайте файл `.env` и поместите туда значения следующих переменных.
 
 - `VK_ACCESS_KEY` - ключ доступа для приложения на права photos, groups, wall и offline
-- `VK_USER_ID` - ваш ID ВК
 - `VK_XKCD_GROUP_ID` - ID вашей группы ВК
 
 
@@ -19,5 +18,5 @@ pip install -r requirements.txt
 
 Чтобы загрузить комикс и опубликовать его, необходимо выполнить команду
 ```
-python3 publish.py
+python3 main.py
 ```
