@@ -1,6 +1,6 @@
 import requests
 import os
-from os.path import splitext, join
+from os.path import join
 from urllib.parse import urlparse, unquote
 from hashlib import blake2b
 from pathlib import Path
@@ -35,7 +35,7 @@ def get_img_url(num):
     return response.json().get('img')
 
 
-def get_comment(num):
+def get_comment(num):   
     url = f'https://xkcd.com/{num}/info.0.json'
     response = requests.get(url)
     return response.json().get('alt')
@@ -61,22 +61,25 @@ def get_wall_upload_server(group_id, access_token):
         'v': 5.131
     }
     response = requests.get(url, params=params)
-    return response.json()
+    return response.json()['response']['upload_url']
 
 
-def post_photo(url, path_to_image):
+def post_photo_on_server(url, path_to_image):
     with open(path_to_image, 'rb') as file:
         files = {
             'photo': file,  
         }
         response = requests.post(url, files=files)
         response.raise_for_status()
-        return response.json()
+        resp_dict = response.json()
+        server, photo, hash_photo = map(lambda key: resp_dict[key], resp_dict) 
+        return server, photo, hash_photo
 
 
 def add_photo_to_albom(group_id, photo, server, hash_photo, access_token):
     params = {
         'group_id': group_id,
+        # 'user_id': user_id,
         'photo': photo,
         'server': server,
         'hash': hash_photo,
@@ -89,18 +92,54 @@ def add_photo_to_albom(group_id, photo, server, hash_photo, access_token):
     return response.json()
 
 
+def post_photo_on_wall(group_id, owner_id, massage, photo_id, access_token):
+    params = {
+        'owner_id': f'-{group_id}',
+        'message': massage,
+        'from_group': 1,
+        'access_token': access_token,
+        'attachments': f'photo{owner_id}_{photo_id}',
+        'v': 5.131,
+    }
+    url = 'https://api.vk.com/method/wall.post'
+    response = requests.post(url=url, params=params)
+    response.raise_for_status()
+    return response.json()
+
+
+def post_comix_on_wall(path_to_image, access_token):
+    url = get_wall_upload_server(group_id, access_token=access_token)
+    server, photo, hash_photo = post_photo_on_server(url=url, path_to_image=path_to_image)
+    resp = add_photo_to_albom(
+        group_id=group_id, 
+        # user_id=user_id, 
+        photo=photo, 
+        server=server, 
+        hash_photo=hash_photo, 
+        access_token=access_token)
+
+    photo_id = resp['response'][0]['id']
+    owner_id = resp['response'][0]['owner_id']
+
+    resp = post_photo_on_wall(
+        group_id=group_id, 
+        photo_id=photo_id,
+        owner_id=owner_id, 
+        massage='bla-bla', 
+        access_token=access_token
+        )
+
+
 if __name__ == '__main__':
     # url = get_img_url(353)
     # save_picture(url=url, directory='images')
     # print(get_comment(353))
 
     load_dotenv()
-    access_token = os.environ['VK_BOT_ACCESS_KEY']
+    access_token = os.environ['VK_ACCESS_KEY']
     user_id = os.environ['VK_USER_ID']
-
     group_id = os.environ['VK_XKCD_GROUP_ID']
-    url = get_wall_upload_server(group_id, access_token=access_token).get('response').get('upload_url')
-    resp = post_photo(url=url, path_to_image='./images/35e508cb6cpython.png')
-    server, photo, hash_photo = map(lambda key: resp[key], resp)
-    resp = add_photo_to_albom(group_id, photo, server, hash_photo, access_token)
-    pprint(resp)
+    post_comix_on_wall(
+        path_to_image='./images/35e508cb6cpython.png',
+        access_token=access_token
+        )
