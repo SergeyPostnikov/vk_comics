@@ -49,8 +49,8 @@ def get_comics(num):
 
 def get_random_comics(comics_amount):
     comics_number = randint(1, comics_amount)
-    url, alt = get_comics(num=comics_number)
-    path_to_image = save_picture(url=url)
+    url, alt = get_comics(comics_number)
+    path_to_image = save_picture(url)
     return path_to_image, alt
 
 
@@ -61,12 +61,12 @@ def get_wall_upload_server(group_id, access_token):
         'access_token': access_token,
         'v': 5.131
     }
-    response = requests.get(url, params=params)
+    response = requests.get(url, params)
     response.raise_for_status()
     return response.json()['response']['upload_url']
 
 
-def post_photo_on_server(url, path_to_image):
+def upload_photo_on_server(url, path_to_image):
     with open(path_to_image, 'rb') as file:
         files = {
             'photo': file,  
@@ -88,12 +88,12 @@ def add_photo_to_album(group_id, photo, server, hash_photo, access_token):
         'v': 5.131,
     }
     url = 'https://api.vk.com/method/photos.saveWallPhoto'
-    response = requests.post(url=url, params=params)
+    response = requests.post(url, params)
     response.raise_for_status()
     return response.json()
 
 
-def post_photo_on_wall(group_id, owner_id, massage, photo_id, access_token):
+def post_photo_on_wall(group_id, owner_id, photo_id, access_token, massage,):
     params = {
         'owner_id': f'-{group_id}',
         'message': massage,
@@ -103,41 +103,41 @@ def post_photo_on_wall(group_id, owner_id, massage, photo_id, access_token):
         'v': 5.131,
     }
     url = 'https://api.vk.com/method/wall.post'
-    response = requests.post(url=url, params=params)
+    response = requests.post(url, params)
     response.raise_for_status()
     return response.json()
 
 
-def post_comics_on_wall(path_to_image, alt, access_token):
-    url = get_wall_upload_server(group_id, access_token=access_token)
-    server, photo, hash_photo = post_photo_on_server(url=url, path_to_image=path_to_image)
-    resp = add_photo_to_albom(
-        group_id=group_id, 
-        photo=photo, 
-        server=server, 
-        hash_photo=hash_photo, 
-        access_token=access_token)
-
-    photo_id = resp['response'][0]['id']
-    owner_id = resp['response'][0]['owner_id']
-
-    resp = post_photo_on_wall(
-        group_id=group_id, 
-        photo_id=photo_id,
-        owner_id=owner_id, 
-        massage=alt, 
-        access_token=access_token
-        )
+def post_comics_on_wall(path_to_image, alt, access_token, owner_id, photo_id):
+    url = 'https://api.vk.com/method/wall.post'
+    params = {
+        'owner_id': f'-{group_id}',
+        'message': alt,
+        'from_group': 1,
+        'access_token': access_token,
+        'attachments': f'photo{owner_id}_{photo_id}',
+        'v': 5.131,
+    }
+    response = requests.post(url, params)
+    response.raise_for_status()
+    return response.json()
 
 
 def main(access_token, group_id):
     comics_amount = get_comics_amount()
     path_to_image, alt = get_random_comics(comics_amount)
+    
+    url = get_wall_upload_server(group_id, access_token)
+    server, photo, hash_photo = upload_photo_on_server(url, path_to_image)
+    resp = add_photo_to_album(
+        group_id, photo, server, hash_photo, access_token
+        )
+
+    photo_id = resp['response'][0]['id']
+    owner_id = resp['response'][0]['owner_id']    
 
     post_comics_on_wall(
-        path_to_image=path_to_image,
-        alt=alt,
-        access_token=access_token
+        path_to_image, alt, access_token, owner_id, photo_id
         )
     
     os.remove(path_to_image)
