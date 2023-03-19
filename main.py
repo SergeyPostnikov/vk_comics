@@ -18,8 +18,8 @@ def get_filename(url):
     return filename
 
 
-def save_picture(url, params=None):
-    response = requests.get(url, params=params)
+def save_picture(url):
+    response = requests.get(url)
     response.raise_for_status()
     filename = get_filename(url)
     path_to_image = join(BASE_DIR, filename)
