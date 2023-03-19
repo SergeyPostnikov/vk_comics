@@ -72,10 +72,10 @@ def post_photo_on_server(url, path_to_image):
             'photo': file,  
         }
         response = requests.post(url, files=files)
-        response.raise_for_status()
-        resp_dict = response.json()
-        server, photo, hash_photo = map(lambda key: resp_dict[key], resp_dict) 
-        return server, photo, hash_photo
+    response.raise_for_status()
+    resp_dict = response.json()
+    server, photo, hash_photo = map(lambda key: resp_dict[key], resp_dict) 
+    return server, photo, hash_photo
 
 
 def add_photo_to_albom(group_id, photo, server, hash_photo, access_token):
