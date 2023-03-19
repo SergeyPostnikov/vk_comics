@@ -2,12 +2,11 @@ import requests
 import os
 from os.path import join
 from urllib.parse import urlparse, unquote
-from hashlib import blake2b
 from pathlib import Path
 from dotenv import load_dotenv
 
 from random import randint
-import os
+
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -16,9 +15,7 @@ def get_filename(url):
     path = urlparse(url).path
     row_name = path.split("/")[-1]
     filename = unquote(row_name)
-    hashed_name = blake2b(digest_size=5)
-    hashed_name.update(bytes(filename, encoding='utf-8'))
-    return f'{hashed_name.hexdigest()}{filename}'
+    return filename
 
 
 def save_picture(url, directory, params=None):
