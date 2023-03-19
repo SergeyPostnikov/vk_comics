@@ -18,12 +18,11 @@ def get_filename(url):
     return filename
 
 
-def save_picture(url, directory, params=None):
+def save_picture(url, params=None):
     response = requests.get(url, params=params)
     response.raise_for_status()
-    os.makedirs(directory, exist_ok=True)
     filename = get_filename(url)
-    path_to_image = join(BASE_DIR, 'images', filename)
+    path_to_image = join(BASE_DIR, filename)
 
     with open(path_to_image, 'wb') as file:
         file.write(response.content)
@@ -51,7 +50,7 @@ def get_comics(num):
 def get_random_comics(comics_amount):
     comics_number = randint(1, comics_amount)
     url, alt = get_comics(num=comics_number)
-    path_to_image = save_picture(url=url, directory='images')
+    path_to_image = save_picture(url=url)
     return path_to_image, alt
 
 
