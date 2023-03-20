@@ -17,7 +17,8 @@ pip install -r requirements.txt
 выполнить запрос на страницу, передав id в параметре client_id.
 `
 https://oauth.vk.com/authorize?scope=photos,groups,wall,offline&client_id=<ID вашего приложения>response_type=token
-`
+`  
+
 Принять, и если всё прошло правильно в адресной строке вернётся access_token.
 ## Запуск
 Чтобы загрузить комикс и опубликовать его, необходимо выполнить команду
