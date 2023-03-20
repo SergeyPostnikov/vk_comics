@@ -11,6 +11,15 @@ from random import randint
 BASE_DIR = Path(__file__).resolve().parent
 
 
+class VKError(Exception):
+    pass
+
+
+def vk_error_raise(response_json):
+    if response_json.get('error'):
+        raise VKError(response_json['error']['error_msg'])
+
+
 def get_filename(url):
     path = urlparse(url).path
     row_name = path.split("/")[-1]
@@ -63,7 +72,9 @@ def get_wall_upload_server(group_id, access_token):
     }
     response = requests.get(url, params)
     response.raise_for_status()
-    return response.json()['response']['upload_url']
+    response_json = response.json()
+    vk_error_raise(response_json)
+    return response_json['response']['upload_url']
 
 
 def upload_photo_on_server(url, path_to_image):
@@ -74,6 +85,7 @@ def upload_photo_on_server(url, path_to_image):
         response = requests.post(url, files=files)
     response.raise_for_status()
     resp = response.json()
+    vk_error_raise(resp)
     server, photo, hash_photo = map(lambda key: resp[key], resp) 
     return server, photo, hash_photo
 
@@ -90,7 +102,9 @@ def add_photo_to_album(group_id, photo, server, hash_photo, access_token):
     url = 'https://api.vk.com/method/photos.saveWallPhoto'
     response = requests.post(url, params)
     response.raise_for_status()
-    return response.json()
+    response_json = response.json()
+    vk_error_raise(response_json)
+    return response_json
 
 
 def post_photo_on_wall(group_id, owner_id, photo_id, access_token, massage,):
@@ -105,7 +119,9 @@ def post_photo_on_wall(group_id, owner_id, photo_id, access_token, massage,):
     url = 'https://api.vk.com/method/wall.post'
     response = requests.post(url, params)
     response.raise_for_status()
-    return response.json()
+    response_json = response.json()
+    vk_error_raise(response_json)
+    return response_json
 
 
 def post_comics_on_wall(path_to_image, alt, access_token, owner_id, photo_id):
@@ -120,7 +136,9 @@ def post_comics_on_wall(path_to_image, alt, access_token, owner_id, photo_id):
     }
     response = requests.post(url, params)
     response.raise_for_status()
-    return response.json()
+    response_json = response.json()
+    vk_error_raise(response_json)
+    return response_json
 
 
 def main(access_token, group_id):
