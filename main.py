@@ -124,7 +124,8 @@ def post_photo_on_wall(group_id, owner_id, photo_id, access_token, massage,):
     return response_json
 
 
-def post_comics_on_wall(path_to_image, alt, access_token, owner_id, photo_id):
+def post_comics_on_wall(path_to_image, alt, access_token, 
+                        owner_id, photo_id, group_id):
     url = 'https://api.vk.com/method/wall.post'
     params = {
         'owner_id': f'-{group_id}',
@@ -141,7 +142,11 @@ def post_comics_on_wall(path_to_image, alt, access_token, owner_id, photo_id):
     return response_json
 
 
-def main(access_token, group_id):
+def main(): 
+    load_dotenv()
+    access_token = os.environ['VK_ACCESS_KEY']
+    group_id = os.environ['VK_XKCD_GROUP_ID']
+    
     comics_amount = get_comics_amount()
     path_to_image, alt = get_random_comics(comics_amount)
     
@@ -155,15 +160,11 @@ def main(access_token, group_id):
     owner_id = resp['response'][0]['owner_id']    
 
     post_comics_on_wall(
-        path_to_image, alt, access_token, owner_id, photo_id
+        path_to_image, alt, access_token, owner_id, photo_id, group_id
         )
     
     os.remove(path_to_image)
 
 
 if __name__ == '__main__':
-    load_dotenv()
-    access_token = os.environ['VK_ACCESS_KEY']
-    group_id = os.environ['VK_XKCD_GROUP_ID']
-
-    main(access_token=access_token, group_id=group_id)
+    main()
