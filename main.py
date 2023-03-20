@@ -146,10 +146,10 @@ def main():
     load_dotenv()
     access_token = os.environ['VK_ACCESS_KEY']
     group_id = os.environ['VK_XKCD_GROUP_ID']
-    
+
     comics_amount = get_comics_amount()
     path_to_image, alt = get_random_comics(comics_amount)
-    
+    raise ValueError
     url = get_wall_upload_server(group_id, access_token)
     server, photo, hash_photo = upload_photo_on_server(url, path_to_image)
     resp = add_photo_to_album(
@@ -157,13 +157,16 @@ def main():
         )
 
     photo_id = resp['response'][0]['id']
-    owner_id = resp['response'][0]['owner_id']    
+    owner_id = resp['response'][0]['owner_id']
 
-    post_comics_on_wall(
-        path_to_image, alt, access_token, owner_id, photo_id, group_id
+    try:
+        post_comics_on_wall(
+            path_to_image, alt, access_token, owner_id, photo_id, group_id
         )
-    
-    os.remove(path_to_image)
+    except requests.exceptions.RequestException as err:
+        print('Проблемы с соединением:', err)
+    finally:
+        os.remove(path_to_image)
 
 
 if __name__ == '__main__':
