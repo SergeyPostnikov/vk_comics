@@ -2,22 +2,22 @@
 
 Проект предназначен для скачивания комиксов с сайта [xkcd](https://xkcd.com/) и публикации их в группе ВК с помощью ВК приложения. 
 ## Окружение
-### зависимости
+### Зависимости
 Python3 должен быть уже установлен. 
 Затем используйте `pip` (или `pip3`, если есть конфликт с Python2) для установки зависимостей:
 ```
 pip install -r requirements.txt
 ```
-### переменные окружения
+### Переменные окружения
 Создайте файл `.env` и поместите туда значения следующих переменных.
 - `VK_ACCESS_KEY` - ключ доступа для приложения на права photos, groups, wall и offline
 - `VK_XKCD_GROUP_ID` - ID вашей группы ВК
-#### как получить
-создать приложение vk, и скопировать его id 
-выполнить запрос на страницу, передав id в параметре client_id.
-`
-https://oauth.vk.com/authorize?scope=photos,groups,wall,offline&client_id=<ID вашего приложения>response_type=token
-`  
+#### Как получить  access_token aka VK_ACCESS_KEY
+создать приложение vk, и скопировать его id,  
+выполнить запрос на следующую страницу, передав id в параметре client_id.  
+```
+https://oauth.vk.com/authorize?scope=photos,groups,wall,offline&client_id=<ID вашего приложения>&response_type=token
+``` 
 
 Принять, и если всё прошло правильно в адресной строке вернётся access_token.
 ## Запуск
