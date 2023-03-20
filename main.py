@@ -148,18 +148,17 @@ def main():
     group_id = os.environ['VK_XKCD_GROUP_ID']
 
     comics_amount = get_comics_amount()
-    path_to_image, alt = get_random_comics(comics_amount)
-    raise ValueError
-    url = get_wall_upload_server(group_id, access_token)
-    server, photo, hash_photo = upload_photo_on_server(url, path_to_image)
-    resp = add_photo_to_album(
-        group_id, photo, server, hash_photo, access_token
-        )
-
-    photo_id = resp['response'][0]['id']
-    owner_id = resp['response'][0]['owner_id']
-
     try:
+        url = get_wall_upload_server(group_id, access_token)
+        path_to_image, alt = get_random_comics(comics_amount)
+        server, photo, hash_photo = upload_photo_on_server(url, path_to_image)
+        resp = add_photo_to_album(
+            group_id, photo, server, hash_photo, access_token
+            )
+
+        photo_id = resp['response'][0]['id']
+        owner_id = resp['response'][0]['owner_id']
+
         post_comics_on_wall(
             path_to_image, alt, access_token, owner_id, photo_id, group_id
         )
